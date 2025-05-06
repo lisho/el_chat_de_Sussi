@@ -1,0 +1,73 @@
+body {
+    font-family: 'Inter', sans-serif;
+    overscroll-behavior: none; /* Evita el "pull-to-refresh" en móviles que interfiere con el scroll */
+}
+#chat-messages::-webkit-scrollbar,
+#conversation-list::-webkit-scrollbar {
+    width: 8px;
+}
+#chat-messages::-webkit-scrollbar-track,
+#conversation-list::-webkit-scrollbar-track {
+    background: #4A5568; /* slate-700 */
+    border-radius: 10px;
+}
+#chat-messages::-webkit-scrollbar-thumb,
+#conversation-list::-webkit-scrollbar-thumb {
+    background: #718096; /* slate-500 */
+    border-radius: 10px;
+}
+#chat-messages::-webkit-scrollbar-thumb:hover,
+#conversation-list::-webkit-scrollbar-thumb:hover {
+    background: #A0AEC0; /* slate-400 */
+}
+.chat-bubble {
+    transition: all 0.3s ease;
+}
+.chat-bubble-user {
+    background-color: #527996; /* Azul grisáceo personalizado */
+}
+.chat-bubble-ai {
+    background-color: #6A8E7F; /* Verde grisáceo personalizado */
+}
+.new-message-animation {
+    animation: fadeInScale 0.5s ease-out;
+}
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.9) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.conversation-item.active {
+    background-color: #4A5568; /* slate-700 */
+}
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    margin: 0 1px;
+    background-color: #CBD5E0; /* slate-300 */
+    display: inline-block;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: typing 1s infinite alternate;
+}
+.typing-indicator span:nth-child(1) { animation-delay: 0s; }
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing {
+    to { opacity: 1; transform: translateY(-2px); }
+}
+/* Mejoras para el textarea */
+#message-input {
+    scrollbar-width: thin;
+    scrollbar-color: #A0AEC0 #E2E8F0; /* thumb track */
+}
+#message-input::-webkit-scrollbar {
+    width: 6px;
+}
+#message-input::-webkit-scrollbar-track {
+    background: #E2E8F0; /* slate-200 */
+}
+#message-input::-webkit-scrollbar-thumb {
+    background-color: #A0AEC0; /* slate-400 */
+    border-radius: 3px;
+    border: 1px solid #E2E8F0; /* slate-200 */
+}

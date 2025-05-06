@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente IA de Resúmenes V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-200 flex flex-col h-screen antialiased text-slate-800">
+
+    <header class="bg-slate-800 text-white p-3 shadow-md flex justify-between items-center">
+        <h1 class="text-lg font-semibold">Asistente IA Resumidor</h1>
+        <button id="notifications-placeholder-btn" title="Activar notificaciones (funcionalidad futura)" class="text-slate-400 hover:text-white transition-colors">
+            <i class="fas fa-bell"></i>
+        </button>
+    </header>
+
+    <div class="flex-grow flex flex-col md:flex-row overflow-hidden">
+        
+        <aside class="w-full md:w-72 lg:w-80 bg-slate-700 p-4 flex flex-col space-y-4 md:border-r border-slate-600 text-slate-200">
+            <div class="flex flex-col items-center space-y-3">
+                <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full w-24 h-24 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-brain fa-3x text-white"></i>
+                </div>
+                <h2 class="text-lg font-medium">IA Resumidora</h2>
+                <p class="text-xs text-slate-400 text-center px-2">Tu copiloto para analizar y resumir textos complejos.</p>
+            </div>
+            
+            <hr class="border-slate-600">
+
+            <div>
+                <button id="new-conversation-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-75 transition duration-150 ease-in-out mb-3 text-sm">
+                    <i class="fas fa-plus-circle mr-2"></i>Nueva Conversación
+                </button>
+                <h3 class="text-sm font-semibold text-slate-300 mb-2">Conversaciones Anteriores</h3>
+                <div id="conversation-list" class="max-h-60 md:flex-grow overflow-y-auto space-y-1 pr-1">
+                    </div>
+            </div>
+             <div class="mt-auto text-center text-xs text-slate-500 pt-4">
+                <p>&copy; 2024 Resumidor IA</p>
+            </div>
+        </aside>
+
+        <main class="flex-grow flex flex-col bg-white shadow-inner">
+            <div id="chat-messages" class="flex-grow p-4 md:p-6 space-y-4 overflow-y-auto">
+                </div>
+
+            <div id="typing-indicator-container" class="p-4 md:p-6 hidden">
+                 <div class="flex items-start space-x-3">
+                    <div class="bg-slate-500 rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center shadow">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div>
+                        <div class="chat-bubble-ai text-white p-3 rounded-lg rounded-tl-none shadow">
+                            <div class="typing-indicator">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-100 p-3 md:p-4 border-t border-slate-300">
+                <form id="chat-form" class="flex items-center space-x-2 md:space-x-3">
+                    <textarea id="message-input"
+                           class="flex-grow p-3 border border-slate-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none shadow-sm text-sm leading-relaxed"
+                           placeholder="Pega tu texto y las instrucciones aquí..."
+                           rows="2"
+                           aria-label="Entrada de mensaje"></textarea>
+                    <button type="submit"
+                            id="send-button"
+                            aria-label="Enviar mensaje"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold p-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition duration-150 ease-in-out h-full">
+                        <i class="fas fa-paper-plane fa-lg"></i>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
