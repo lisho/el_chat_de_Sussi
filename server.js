@@ -79,4 +79,8 @@ app.post('/api/summarize', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor escuchando en puerto ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en puerto ${PORT}`)
+    console.log(`Permitiendo CORS para el origen: ${corsOptions.origin}`); // Log para confirmar la config
+
+});
