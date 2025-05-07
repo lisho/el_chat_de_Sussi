@@ -1,9 +1,34 @@
 // server.js (simplificado)
 const express = require('express');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
+const cors = require('cors'); // Ya lo tienes importado
 require('dotenv').config(); // Para cargar API_KEY desde .env
 
 const app = express();
+
+// --- CONFIGURACIÓN DE CORS ---
+// Esta es la línea clave que necesitas ajustar.
+// En desarrollo, puedes ser un poco más permisivo.
+// Para producción, deberías ser más específico.
+
+// Opción 1: Permitir un origen específico (RECOMENDADO PARA PRODUCCIÓN Y BUENO PARA DESARROLLO)
+const corsOptions = {
+    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // ¡ASEGÚRATE QUE ESTE ES EL PUERTO DONDE SIRVES TU FRONTEND!
+    optionsSuccessStatus: 200 // Algunos navegadores antiguos (IE11, varios SmartTVs) se ahogan con 204
+  };
+  app.use(cors(corsOptions));
+  
+  // Opción 2: Permitir cualquier origen (SOLO PARA DESARROLLO RÁPIDO, NO PARA PRODUCCIÓN)
+  // app.use(cors()); // Esto establece Access-Control-Allow-Origin: '*'
+  
+  // Opción 3: Configuración más detallada si necesitas permitir métodos o cabeceras específicas
+  // app.use(cors({
+  //   origin: 'http://127.0.0.1:5500',
+  //   methods: ['GET', 'POST', 'OPTIONS'], // Asegúrate que OPTIONS está aquí para preflight
+  //   allowedHeaders: ['Content-Type', 'Authorization'], // Si usas otras cabeceras
+  //   credentials: true // Si necesitas enviar cookies
+  // }));
+
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -12,7 +37,7 @@ app.post('/api/summarize', async (req, res) => {
     try {
         const { userInput, systemPrompt, messages } = req.body; // `messages` sería un array de {role, parts}
 
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" }); // O el modelo que prefieras
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-preview-04-17" }); // O el modelo que prefieras
 
         // Construir el historial para Gemini
         // El formato es [{ role: "user", parts: [{text: "..."}]}, {role: "model", parts: [{text: "..."}]}]

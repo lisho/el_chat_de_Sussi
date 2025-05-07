@@ -12,7 +12,7 @@ const URLS_TO_CACHE = [
     'js/conversation.js', // AÑADIDO
     'js/api.js',          // AÑADIDO
     'js/utils.js',       
-    '/images/avatar.png'
+    'images/sussi-avatar.png', // Añade esta línea
 ];
 
 // Evento de instalación: se dispara cuando el Service Worker se instala.

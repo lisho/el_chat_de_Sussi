@@ -5,6 +5,20 @@ import { MAX_CONVERSATIONS, INITIAL_GREETING_AI, SYSTEM_PROMPT, MAX_MESSAGES_PER
 let conversations = [];
 let currentConversationId = null;
 
+export function deleteConversation(id) {
+    const initialLength = conversations.length;
+    conversations = conversations.filter(c => c.id !== id);
+    
+    if (conversations.length < initialLength) { // Si algo se borró
+        if (currentConversationId === id) { // Si se borró la conversación activa
+            currentConversationId = conversations.length > 0 ? conversations[0].id : null; // Activa la primera o ninguna
+        }
+        saveConversations();
+        return true; // Borrado exitoso
+    }
+    return false; // No se encontró la conversación
+}
+
 export function getConversationsState() {
     return { conversations, currentConversationId };
 }
@@ -19,7 +33,9 @@ export function createNewConversation(makeActive = true) {
     const newId = generateId();
     const newConv = {
         id: newId,
-        name: `Conversación ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`,
+        //name: `Conversación ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`,
+        name: `Conversación ${new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })}`,
+
         messages: [{ ...INITIAL_GREETING_AI, timestamp: Date.now() }], // Timestamp fresco aquí
         createdAt: Date.now(),
         systemPrompt: SYSTEM_PROMPT

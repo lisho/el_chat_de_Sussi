@@ -1,21 +1,24 @@
 {
-    "name": "Asistente IA Resumidor Pro",
-    "short_name": "IA Resumidor",
-    "description": "PWA avanzada para chatear con una IA, resumir y formatear textos con historial de conversaciones.",
+    "name": "SUSSI - Asistente de Edición de Ofertas",
+    "short_name": "IA Sussi",
+    "description": "PWA avanzada para chatear con una IA, resumir y formatear ofertas de empleo con historial de conversaciones.",
     "start_url": "index.html",
     "display": "standalone",
+    "display_override": ["window-controls-overlay"],
+    "version": "0.8",
+    "lang": "es-ES",
     "background_color": "#CBD5E0", 
     "theme_color": "#1E293B", 
     "orientation": "portrait-primary",
     "icons": [
       {
-        "src": "https://placehold.co/192x192/6A8E7F/FFFFFF?text=IA&font=inter", 
+        "src": "images/android-chrome-192x192.png", 
         "sizes": "192x192",
         "type": "image/png",
         "purpose": "any maskable"
       },
       {
-        "src": "https://placehold.co/512x512/527996/FFFFFF?text=IA&font=inter", 
+        "src": "images/android-chrome-512x512.png", 
         "sizes": "512x512",
         "type": "image/png",
         "purpose": "any maskable"

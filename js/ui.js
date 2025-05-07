@@ -42,66 +42,117 @@ export function appendMessageDOM(sender, messageText, isHtml = false, animate = 
     if (!uiElements.chatMessages) return;
 
     const messageWrapper = document.createElement('div');
-    messageWrapper.classList.add('flex', 'items-start', 'space-x-3', 'max-w-full', 'mb-1');
+    // 'group' para group-hover en el botón. 'relative' para el posicionamiento absoluto del botón.
+    messageWrapper.classList.add('flex', 'items-start', 'space-x-3', 'max-w-full', 'mb-1', 'group', 'relative');
     if (animate) {
         messageWrapper.classList.add('new-message-animation');
     }
 
-    const avatarDiv = document.createElement('div');
-    avatarDiv.classList.add('rounded-full', 'w-10', 'h-10', 'flex-shrink-0', 'flex', 'items-center', 'justify-center', 'shadow-md');
+    const avatarContainer = document.createElement('div');
+    avatarContainer.classList.add('rounded-full', 'w-10', 'h-10', 'flex-shrink-0', 'flex', 'items-center', 'justify-center', 'shadow-md');
 
-    const icon = document.createElement('i');
-    icon.classList.add('fas');
-
-    const messageContentOuter = document.createElement('div');
+    const messageContentOuter = document.createElement('div'); // Contenedor para burbuja y nombre/hora
     messageContentOuter.classList.add('flex', 'flex-col');
-
+    
     const bubbleDiv = document.createElement('div');
-    // Clases base para todas las burbujas
     bubbleDiv.classList.add('p-3', 'rounded-lg', 'shadow-md', 'text-sm', 'leading-relaxed');
-
+    
     const metaInfoSpan = document.createElement('span');
     metaInfoSpan.classList.add('text-xs', 'text-slate-500', 'mt-1');
-
+    
     const time = new Date(timestamp || Date.now()).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const date = new Date(timestamp || Date.now()).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
     if (sender === 'user') {
         messageWrapper.classList.add('justify-end');
-        messageContentOuter.classList.add('items-end');
+        messageContentOuter.classList.add('items-end'); // Alinear contenido a la derecha
         bubbleDiv.classList.add('chat-bubble-user', 'text-white', 'rounded-br-none');
-        bubbleDiv.classList.add('max-w-md', 'lg:max-w-lg', 'xl:max-w-xl'); // Tamaños
-        metaInfoSpan.textContent = `Tú - ${time}`;
+        bubbleDiv.classList.add('max-w-md', 'lg:max-w-lg', 'xl:max-w-xl');
+        metaInfoSpan.textContent = `Tú - ${date} - ${time}`;
         metaInfoSpan.classList.add('text-right');
 
         messageContentOuter.appendChild(bubbleDiv);
         messageContentOuter.appendChild(metaInfoSpan);
         messageWrapper.appendChild(messageContentOuter);
     } else { // AI o Error
-        messageWrapper.classList.add('justify-start');
+        messageWrapper.classList.add('justify-start'); // Mensaje a la izquierda
+        messageContentOuter.classList.add('items-start'); // Alinear contenido a la izquierda
 
-        if (sender === 'error') {
-            avatarDiv.classList.add('bg-red-500');
-            icon.classList.add('fa-exclamation-triangle', 'text-white');
-            bubbleDiv.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-300');
-        } else { // 'ai'
-            avatarDiv.classList.add('bg-slate-600');
-            icon.classList.add('fa-robot', 'text-white');
+        if (sender === 'ai') {
+            avatarContainer.classList.add('bg-slate-700');
+            const imgAvatar = document.createElement('img');
+            imgAvatar.src = 'images/sussi-avatar.jpeg';
+            imgAvatar.alt = 'Avatar IA';
+            imgAvatar.classList.add('w-full', 'h-full', 'object-cover', 'rounded-full');
+            avatarContainer.appendChild(imgAvatar);
             bubbleDiv.classList.add('chat-bubble-ai', 'text-white');
+        } else if (sender === 'error') {
+            avatarContainer.classList.add('bg-red-500');
+            const icon = document.createElement('i');
+            icon.classList.add('fas', 'fa-exclamation-triangle', 'text-white');
+            avatarContainer.appendChild(icon);
+            bubbleDiv.classList.add('bg-red-100', 'text-red-700', 'border', 'border-red-300');
         }
-        avatarDiv.appendChild(icon);
-
-        // Clases comunes para la burbuja de AI/Error
+        
         bubbleDiv.classList.add('rounded-tl-none');
         bubbleDiv.classList.add('max-w-md', 'lg:max-w-lg', 'xl:max-w-xl'); // Tamaños
 
-        metaInfoSpan.textContent = `${sender === 'error' ? 'Error' : 'IA'} - ${time}`;
-
+        metaInfoSpan.textContent = `${sender === 'error' ? 'Error' : 'IA'} - ${date} - ${time}`;
+        
         messageContentOuter.appendChild(bubbleDiv);
         messageContentOuter.appendChild(metaInfoSpan);
-        messageWrapper.appendChild(avatarDiv);
-        messageWrapper.appendChild(messageContentOuter);
+
+        // El orden de appendChild es importante para flexbox y posicionamiento
+        messageWrapper.appendChild(avatarContainer);   // Avatar primero a la izquierda
+        messageWrapper.appendChild(messageContentOuter); // Luego el contenido del mensaje
+
+        // --- BOTÓN DE COPIAR (SOLO PARA IA, FUERA DE LA BURBUJA) ---
+        if (sender === 'ai') {
+            const copyButton = document.createElement('button');
+            // Clases para posicionar fuera, a la derecha de la burbuja, y un poco más grande
+            // 'self-center' o 'self-start'/'self-end' para alinear verticalmente con el messageWrapper si es necesario
+            // Ajusta 'top-1/2 -translate-y-1/2' para centrar verticalmente respecto a la burbuja
+            // O 'bottom-0' para alinearlo con la parte inferior de la burbuja
+            // El 'ml-2' lo separa de la burbuja
+            copyButton.className = 'ml-2 p-2 text-slate-400 hover:text-slate-600 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity rounded-md hover:bg-slate-200 active:bg-slate-300 self-center';
+            // Ícono un poco más grande (FontAwesome no usa fa-sm, fa-lg, etc. para tamaño directo, pero podemos ajustar el padding del botón o el font-size del ícono)
+            copyButton.innerHTML = '<i class="fas fa-copy"></i>'; // quitamos fa-xs para tamaño por defecto del ícono
+            copyButton.setAttribute('aria-label', 'Copiar texto de la IA');
+            copyButton.setAttribute('title', 'Copiar texto');
+            
+            let textToCopy;
+            if (isHtml) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = messageText;
+                textToCopy = tempDiv.textContent || tempDiv.innerText || "";
+            } else {
+                textToCopy = messageText;
+            }
+
+            copyButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => {
+                        copyButton.innerHTML = '<i class="fas fa-check text-emerald-500"></i>';
+                        setTimeout(() => {
+                            copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+                        }, 1500);
+                    })
+                    .catch(err => {
+                        console.error('Error al copiar texto: ', err);
+                        const originalIcon = copyButton.innerHTML;
+                        copyButton.innerHTML = '<i class="fas fa-times text-red-500"></i>';
+                        setTimeout(() => {
+                            copyButton.innerHTML = originalIcon;
+                        }, 2000);
+                    });
+            });
+            // Añadir el botón de copiar directamente al messageWrapper, después del contenido del mensaje
+            messageWrapper.appendChild(copyButton);
+        }
     }
 
+    // Establecer el contenido de la burbuja
     if (isHtml) {
         bubbleDiv.innerHTML = messageText;
     } else {
@@ -116,7 +167,7 @@ export function appendMessageDOM(sender, messageText, isHtml = false, animate = 
     }
 }
 
-export function renderConversationList(conversations, currentConversationId, switchConversationCallback) {
+export function renderConversationList(conversations, currentConversationId, switchConversationCallback, deleteConversationCallback) {
     if (!uiElements.conversationList) return;
     uiElements.conversationList.innerHTML = '';
     if (conversations.length === 0) {
@@ -124,18 +175,33 @@ export function renderConversationList(conversations, currentConversationId, swi
         return;
     }
     conversations.forEach(conv => {
-        const item = document.createElement('button');
-        // Usar className para asignar múltiples clases iniciales, luego classList si es necesario
-        item.className = 'w-full text-left p-2 rounded-md hover:bg-slate-600 transition-colors text-sm truncate conversation-item';
+        const listItem = document.createElement('div'); // Contenedor para el botón y el ícono de borrado
+        listItem.className = 'flex items-center justify-between group'; // group para hover en el ícono
+
+        const itemButton = document.createElement('button');
+        itemButton.className = 'flex-grow text-left p-2 rounded-md hover:bg-slate-600 transition-colors text-sm truncate conversation-item';
         if (conv.id === currentConversationId) {
-            item.classList.add('active', 'font-semibold'); // .add() está bien para clases individuales
+            itemButton.classList.add('active', 'font-semibold');
         }
-        item.textContent = conv.name || `Conversación ${conv.id.substring(0, 5)}`;
-        item.setAttribute('data-id', conv.id);
-        item.setAttribute('role', 'button');
-        item.setAttribute('aria-label', `Cambiar a ${item.textContent}`);
-        item.addEventListener('click', () => switchConversationCallback(conv.id));
-        uiElements.conversationList.appendChild(item);
+        itemButton.textContent = conv.name || `Conversación ${conv.id.substring(0, 5)}`;
+        itemButton.setAttribute('data-id', conv.id);
+        itemButton.setAttribute('role', 'button');
+        itemButton.setAttribute('aria-label', `Cambiar a ${itemButton.textContent}`);
+        itemButton.addEventListener('click', () => switchConversationCallback(conv.id));
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'p-2 text-slate-400 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100';
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt fa-xs"></i>';
+        deleteButton.setAttribute('aria-label', `Eliminar ${itemButton.textContent}`);
+        deleteButton.setAttribute('data-id', conv.id);
+        deleteButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Evitar que el clic también cambie la conversación
+            deleteConversationCallback(conv.id, itemButton.textContent); // Pasamos el ID y el nombre para confirmación
+        });
+
+        listItem.appendChild(itemButton);
+        listItem.appendChild(deleteButton);
+        uiElements.conversationList.appendChild(listItem);
     });
 }
 

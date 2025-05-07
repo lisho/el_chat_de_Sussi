@@ -1,7 +1,21 @@
+header { /* O el elemento que quieras que esté en la barra de título */
+    /* Asumiendo que tu header es el que quieres mover a la barra de título */
+    position: fixed; /* o app-region: drag si es para toda la ventana */
+    top: 0;
+    left: env(titlebar-area-x, 0); /* Posiciona a la derecha de los controles de ventana */
+    width: env(titlebar-area-width, 100%); /* Usa el ancho disponible */
+    height: env(titlebar-area-height, 30px); /* Usa la altura disponible */
+    padding-left: env(titlebar-area-x, 0); /* Padding para no solapar controles a la izquierda */
+    /* app-region: drag;  Eliminado porque no es compatible con CSS estándar */
+    z-index: 9999; /* Asegúrate de que esté por encima de otros elementos */
+}
+
 body {
     font-family: 'Inter', sans-serif;
-    overscroll-behavior: none; /* Evita el "pull-to-refresh" en móviles que interfiere con el scroll */
+    /*overscroll-behavior: none;  Evita el "pull-to-refresh" en móviles que interfiere con el scroll */
+    padding-top: 30px; /* Espacio para el header */
 }
+
 #chat-messages::-webkit-scrollbar,
 #conversation-list::-webkit-scrollbar {
     width: 8px;
