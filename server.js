@@ -13,7 +13,7 @@ const app = express();
 
 // Opción 1: Permitir un origen específico (RECOMENDADO PARA PRODUCCIÓN Y BUENO PARA DESARROLLO)
 const corsOptions = {
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // ¡ASEGÚRATE QUE ESTE ES EL PUERTO DONDE SIRVES TU FRONTEND!
+    origin: 'https://sussi-app.onrender.com',
     optionsSuccessStatus: 200 // Algunos navegadores antiguos (IE11, varios SmartTVs) se ahogan con 204
   };
   app.use(cors(corsOptions));
