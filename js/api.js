@@ -1,7 +1,7 @@
 // js/api.js
 import { marked } from 'https://esm.sh/marked@9.0.0'; // Ajusta la versión si es necesario
 
-const BACKEND_URL = 'https://sussi-asistant.onrender.com';
+const BACKEND_URL = 'https://sussi-asistant.onrender.com/api/summarize';
 
 export async function getAiResponse(userInput, conversation) {
     console.log("NUEVA API.getAiResponse EJECUTÁNDOSE");
