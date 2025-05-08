@@ -3,42 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente IA de Resúmenes V2</title>
+    <title>Asistente IA Boletín Empleo CyL V2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Favicon links (asegúrate de que las rutas y archivos existan) -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-    <link rel.icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-    <!-- Y otros tamaños como 192x192 para el manifest de PWA -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
 </head>
-<body class="bg-slate-200 flex flex-col h-screen antialiased text-slate-800">
+<body class="bg-slate-200 flex flex-col h-screen antialiased text-slate-800 overflow-hidden">
 
-    <header class="bg-slate-800 text-white p-3 shadow-md flex justify-between items-center">
-        <h1 class="text-lg font-semibold">Asistente IA Boletín Empleo CyL</h1>
-        
-            <button id="install-app-btn" title="Instalar Aplicación" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-1.5 px-3 rounded-lg shadow-md text-sm transition-all duration-150 ease-in-out">
-                <i class="fas fa-download mr-2"></i>Instalar
-            </button>
-            <button id="notifications-placeholder-btn" title="Activar notificaciones (funcionalidad futura)" class="text-slate-400 hover:text-white transition-colors">
-                <i class="fas fa-bell"></i>
-            </button>
-       
-    </header>
+    <!-- Contenedor principal para el layout sidebar + main content -->
+    <div class="flex-grow flex flex-row overflow-hidden" id="app-container">
 
-    <div class="flex-grow flex flex-col md:flex-row overflow-hidden">
-        
-        <aside class="w-full md:w-72 lg:w-80 bg-slate-700 p-4 flex flex-col space-y-4 md:border-r border-slate-600 text-slate-200">
+        <!-- ASIDE (Sidebar) -->
+        <aside id="sidebar" class="w-72 lg:w-80 bg-slate-700 p-4 flex flex-col space-y-4 border-r border-slate-600 text-slate-200 transition-all duration-300 ease-in-out transform md:translate-x-0 -translate-x-full md:relative fixed inset-y-0 left-0 z-30 shadow-lg md:shadow-none">
+            <!-- Botón para cerrar el sidebar en móvil, visible dentro del sidebar -->
+            <div class="md:hidden flex justify-end mb-2">
+                <button id="close-sidebar-btn" class="text-slate-300 hover:text-white p-1" aria-label="Cerrar menú lateral">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+
             <div class="flex flex-col items-center space-y-3">
-                <div class="rounded-full w-24 h-24 flex items-center justify-center shadow-lg overflow-hidden">
+                <div class="rounded-full w-24 h-24 flex items-center justify-center shadow-lg overflow-hidden bg-slate-600">
                     <img src="images/sussi-avatar.jpeg" alt="Avatar de Sussi IA" class="w-full h-full object-cover">
                 </div>
                 <h2 class="text-lg font-medium">Sussi</h2>
-                <p class="text-xs text-slate-400 text-center px-2">Tu copiloto para analizar, resumir y estructurar ofertas de empleo.</p>
+                <p class="text-xs text-slate-400 text-center px-2">Tu copiloto para analizar y resumir ofertas de empleo.</p>
             </div>
             
             <hr class="border-slate-600">
@@ -49,52 +46,82 @@
                 </button>
                 <h3 class="text-sm font-semibold text-slate-300 mb-2">Conversaciones Anteriores</h3>
                 <div id="conversation-list" class="max-h-60 md:flex-grow overflow-y-auto space-y-1 pr-1">
-                    </div>
+                    <!-- La lista de conversaciones se renderiza aquí -->
+                </div>
             </div>
              <div class="mt-auto text-center text-xs text-slate-500 pt-4">
-                <hr><br>
-                <p>&copy; 2025 Sussi IA</p>
+                <p>© 2024 Resumidor IA</p>
             </div>
         </aside>
 
-        <main class="flex-grow flex flex-col bg-white shadow-inner">
-            <div id="chat-messages" class="flex-grow p-4 md:p-6 space-y-4 overflow-y-auto">
+        <!-- Contenedor para el overlay oscuro cuando el sidebar está abierto en móvil -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" aria-hidden="true"></div>
+
+        <!-- MAIN CONTENT WRAPPER (para el header y el chat) -->
+        <div class="flex-grow flex flex-col" id="main-content-wrapper"> <!-- Cambiado el id para evitar confusión con el anterior "main-content" -->
+            
+            <header class="bg-slate-800 text-white px-2 md:px-3 py-3 shadow-md flex justify-between items-center sticky top-0 z-20">
+                <!-- z-20 para que esté sobre el sidebar en algunas transiciones, pero menos que el sidebar abierto -->
+                <button id="open-sidebar-btn" class="md:hidden text-slate-300 hover:text-white p-1.5 mr-2" aria-label="Abrir menú lateral">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <h1 class="text-base md:text-lg font-semibold truncate flex-grow text-center md:text-left">
+                    <span class="md:hidden">Asistente IA Boletín Empleo CyL</span>
+                    <span class="hidden md:inline">Asistente IA</span>
+                </h1>
+                <div class="flex items-center space-x-2">
+                    <button id="install-app-btn" title="Instalar Aplicación" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-semibold p-2 md:py-1.5 md:px-3 rounded-lg shadow-md text-sm transition-all duration-150 ease-in-out flex items-center justify-center">
+                        <i class="fas fa-download text-base"></i>
+                        <span class="hidden md:ml-2 md:inline">Instalar</span>
+                    </button>
+                    <button id="notifications-placeholder-btn" title="Activar notificaciones" class="text-slate-400 hover:text-white transition-colors p-2 rounded-full">
+                        <i class="fas fa-bell text-base"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN CHAT AREA -->
+            <main class="flex-grow flex flex-col bg-white overflow-hidden">
+                <!-- overflow-hidden aquí para asegurar que el scroll interno de chat-messages funcione -->
+                <div id="chat-messages" class="flex-grow p-4 md:p-6 space-y-4 overflow-y-auto">
+                    <!-- Mensajes del chat se renderizan aquí -->
                 </div>
 
-            <div id="typing-indicator-container" class="p-4 md:p-6 hidden">
-                 <div class="flex items-start space-x-3">
-                    <div class="bg-slate-500 rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center shadow">
-                        <i class="fas fa-robot text-white"></i>
-                    </div>
-                    <div>
-                        <div class="chat-bubble-ai text-white p-3 rounded-lg rounded-tl-none shadow">
-                            <div class="typing-indicator">
-                                <span></span><span></span><span></span>
+                <div id="typing-indicator-container" class="p-4 md:p-6 hidden">
+                    <div class="flex items-start space-x-3">
+                        <div class="rounded-full w-10 h-10 flex-shrink-0 flex items-center justify-center shadow-md bg-slate-700">
+                            <img src="images/sussi-avatar.jpeg" alt="Avatar IA escribiendo" class="w-full h-full object-cover rounded-full">
+                        </div>
+                        <div>
+                            <div class="chat-bubble-ai text-white p-3 rounded-lg rounded-tl-none shadow">
+                                <div class="typing-indicator">
+                                    <span></span><span></span><span></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="bg-slate-100 p-3 md:p-4 border-t border-slate-300">
-                <form id="chat-form" class="flex items-center space-x-2 md:space-x-3">
-                    <textarea id="message-input"
-                           class="flex-grow p-3 border border-slate-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none shadow-sm text-sm leading-relaxed"
-                           placeholder="Pega tu texto y las instrucciones aquí..."
-                           rows="2"
-                           aria-label="Entrada de mensaje"></textarea>
-                    <button type="submit"
-                            id="send-button"
-                            aria-label="Enviar mensaje"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold p-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition duration-150 ease-in-out h-full">
-                        <i class="fas fa-paper-plane fa-lg"></i>
-                    </button>
-                </form>
-            </div>
-        </main>
-    </div>
+                <div class="bg-slate-100 p-3 md:p-4 border-t border-slate-300">
+                    <form id="chat-form" class="flex items-center space-x-2 md:space-x-3">
+                        <textarea id="message-input"
+                        class="flex-grow p-3 border border-slate-400 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none shadow-sm text-sm leading-relaxed"
+                        placeholder="Pega tu texto y las instrucciones aquí..."
+                        rows="2"
+                        aria-label="Entrada de mensaje"></textarea>
+                 <button type="submit"
+                         id="send-button"
+                         aria-label="Enviar mensaje"
+                         class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold p-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition duration-150 ease-in-out flex items-center justify-center">
+                         <!-- Quitamos h-full de aquí si usamos items-stretch, el padding controlará la altura interna -->
+                     <i class="fas fa-paper-plane fa-lg p-3"></i>
+                 </button> 
+                    </form>
+                </div>
+            </main> <!-- Cierre de MAIN CHAT AREA -->
+        </div> <!-- Cierre de MAIN CONTENT WRAPPER -->
+    </div> <!-- Cierre de app-container -->
 
     <script type="module" src="js/app.js"></script>
-
 </body>
 </html>

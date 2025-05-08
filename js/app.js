@@ -14,7 +14,13 @@ const domElements = {
     conversationList: document.getElementById('conversation-list'),
     newConversationBtn: document.getElementById('new-conversation-btn'),
     typingIndicatorContainer: document.getElementById('typing-indicator-container'),
-    notificationsPlaceholderBtn: document.getElementById('notifications-placeholder-btn')
+    notificationsPlaceholderBtn: document.getElementById('notifications-placeholder-btn'),
+    sidebar: document.getElementById('sidebar'),
+    openSidebarBtn: document.getElementById('open-sidebar-btn'),
+    closeSidebarBtn: document.getElementById('close-sidebar-btn'),
+    sidebarOverlay: document.getElementById('sidebar-overlay'),
+    appContainer: document.getElementById('app-container'), // Si vas a colapsar en escritorio
+    mainContent: document.getElementById('main-content') // Para ajustar márgenes si colapsas en escritorio
 };
 let deferredInstallPrompt = null; // Para el manejo de la instalación de PWA
 const sendButtonOriginalContent = domElements.sendButton.innerHTML; // Guardar contenido original
@@ -64,12 +70,14 @@ window.startNewConversationFromGreeting = () => {
     handleNewConversation();
 };
 
-
 function handleSwitchConversation(id) {
     const switched = Conversation.switchConversation(id);
     if (switched) {
         refreshFullUI();
         domElements.messageInput.focus();
+        if (window.innerWidth < 768) { // md breakpoint de Tailwind
+            closeMobileSidebar();
+        }
     }
 }
 
@@ -128,6 +136,19 @@ async function handleFormSubmit(event) {
         
     } else if (!activeConv) {
         alert("Por favor, inicia una nueva conversación antes de enviar un mensaje.");
+    }
+}
+
+// --- FUNCIONES DE SIDEBAR ---
+function openMobileSidebar() {
+    if (domElements.sidebar && domElements.sidebarOverlay) {
+        document.body.classList.add('sidebar-mobile-active');
+    }
+}
+
+function closeMobileSidebar() {
+    if (domElements.sidebar && domElements.sidebarOverlay) {
+        document.body.classList.remove('sidebar-mobile-active');
     }
 }
 
@@ -227,6 +248,17 @@ function initializeApp() {
         }
     }
 
+     // Event Listeners para el Sidebar Móvil
+     if (domElements.openSidebarBtn) {
+        domElements.openSidebarBtn.addEventListener('click', openMobileSidebar);
+    }
+    if (domElements.closeSidebarBtn) {
+        domElements.closeSidebarBtn.addEventListener('click', closeMobileSidebar);
+    }
+    if (domElements.sidebarOverlay) {
+        domElements.sidebarOverlay.addEventListener('click', closeMobileSidebar); // Cerrar al hacer clic en el overlay
+    }
+
     checkDisplayMode(); // Llamar para ocultar el botón si ya está instalada
 
     // Registrar Service Worker
@@ -239,6 +271,9 @@ function initializeApp() {
     }
     domElements.messageInput.focus();
 }
+
+
+
 
 // Ejecutar cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', initializeApp);

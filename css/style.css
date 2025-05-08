@@ -1,19 +1,10 @@
-header { /* O el elemento que quieras que esté en la barra de título */
-    /* Asumiendo que tu header es el que quieres mover a la barra de título */
-    position: fixed; /* o app-region: drag si es para toda la ventana */
-    top: 0;
-    left: env(titlebar-area-x, 0); /* Posiciona a la derecha de los controles de ventana */
-    width: env(titlebar-area-width, 100%); /* Usa el ancho disponible */
-    height: env(titlebar-area-height, 30px); /* Usa la altura disponible */
-    padding-left: env(titlebar-area-x, 0); /* Padding para no solapar controles a la izquierda */
-    /* app-region: drag;  Eliminado porque no es compatible con CSS estándar */
-    z-index: 9999; /* Asegúrate de que esté por encima de otros elementos */
-}
+
+
 
 body {
     font-family: 'Inter', sans-serif;
     /*overscroll-behavior: none;  Evita el "pull-to-refresh" en móviles que interfiere con el scroll */
-    padding-top: 30px; /* Espacio para el header */
+    /*padding-top: 30px;  Espacio para el header */
 }
 
 #chat-messages::-webkit-scrollbar,
@@ -84,4 +75,62 @@ body {
     background-color: #A0AEC0; /* slate-400 */
     border-radius: 3px;
     border: 1px solid #E2E8F0; /* slate-200 */
+}
+
+/* Estilos para cuando el sidebar está activo en móvil */
+body.sidebar-mobile-active #sidebar {
+    transform: translateX(0); /* Mueve el sidebar a la vista */
+}
+
+body.sidebar-mobile-active #sidebar-overlay {
+    display: block; /* Muestra el overlay */
+}
+
+/* Opcional: Si quieres que el sidebar también se pueda colapsar en escritorio */
+#app-container.sidebar-collapsed #sidebar {
+    width: 4rem; /* Ancho colapsado, solo iconos quizás */
+    /* overflow: hidden; */
+ } 
+#app-container.sidebar-collapsed #sidebar .sidebar-text { /* Clase para textos a ocultar */
+    display: none; 
+} 
+#app-container.sidebar-collapsed #main-content {
+    margin-left: 4rem; /* Ajustar margen del contenido principal */
+ } 
+
+/* Ajustes para el layout con header dentro de main-content */
+#main-content {
+    /* Si el header es sticky, necesitas considerar su altura aquí */
+    /* Si no, el flex-grow del chat-messages debería funcionar */
+}
+
+/* Asegurar que el chat-messages ocupe el espacio restante correctamente */
+#main-content > main { /* El <main> que contiene el chat */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden; /* Para que el scroll de chat-messages funcione bien */
+}
+
+
+
+
+
+@media (max-width: 767px) { /* Tailwind usa 'md' a partir de 768px */
+    header h1 {
+        font-size: 1rem; /* Un poco más pequeño que text-lg (1.125rem) */
+        /* O podrías tener dos h1 y mostrar/ocultar con clases de Tailwind */
+    }
+    header {
+        padding-left: 0.75rem; /* p-3 es 0.75rem, px-2 es 0.5rem */
+        padding-right: 0.75rem;
+    }
+    /* Si el botón de instalar es muy ancho incluso como icono, puedes darle un ancho fijo */
+    #install-app-btn {
+        /* width: 2.5rem; /* Ejemplo, ajusta según necesites */
+        /* height: 2.5rem; */
+        /* display: inline-flex; */
+        /* align-items: center; */
+        /* justify-content: center; */
+    }
 }
