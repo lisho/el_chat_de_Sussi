@@ -47,9 +47,9 @@ function refreshFullUI() {
         // Podrías mostrar un mensaje por defecto o el saludo inicial si no hay NINGUNA conversación.
         if (conversations.length === 0) {
              UI.renderMessages([], null); // Para que muestre el saludo inicial de ui.js
-        } else {
+         } else {
             domElements.chatMessages.innerHTML = '<p class="p-4 text-center text-slate-500">Selecciona una conversación o crea una nueva.</p>';
-        }
+         }
     }
 }
 
@@ -112,14 +112,18 @@ async function handleFormSubmit(event) {
         try {
             const aiFullMessageObject = await API.getAiResponse(userMessageText, activeConv);
 
-            // Si aiFullMessageObject.sender es 'error', ya está formateado para ser mostrado como error.
-            Conversation.appendMessageToHistory(aiFullMessageObject.sender, aiFullMessageObject.text, aiFullMessageObject.isHtml);
-            UI.appendMessageDOM(aiFullMessageObject.sender, aiFullMessageObject.text, aiFullMessageObject.isHtml, true, aiFullMessageObject.timestamp);
+            if (aiFullMessageObject && aiFullMessageObject.sender) {
+                Conversation.appendMessageToHistory(aiFullMessageObject.sender, aiFullMessageObject.text, aiFullMessageObject.isHtml);
+                UI.appendMessageDOM(aiFullMessageObject.sender, aiFullMessageObject.text, aiFullMessageObject.isHtml, true, aiFullMessageObject.timestamp);
+            } else {
+                throw new Error('Respuesta vacía o inválida del backend');
+            }
 
         } catch (error) { // Este catch es más para errores inesperados en el flujo de app.js en sí
             console.error('Error inesperado en handleFormSubmit:', error);
             const errorTimestamp = Date.now();
-            UI.appendMessageDOM('error', `<p>Hubo un problema inesperado en la aplicación. Intenta de nuevo.</p>`, true, true, errorTimestamp);
+            const errorMsg = error.message || 'Hubo un problema inesperado. Intenta de nuevo.';
+            UI.appendMessageDOM('error', `<p>${errorMsg}</p>`, true, true, errorTimestamp);
         } finally {
             UI.showTypingIndicator(false);
             UI.updateSendButton(false); // El contenido original ya está en uiElements
