@@ -37,7 +37,7 @@ app.post('/api/summarize', async (req, res) => {
     try {
         const { userInput, systemPrompt, messages } = req.body; // `messages` sería un array de {role, parts}
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // O el modelo que prefieras
+        const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" }); // O el modelo que prefieras
 
         // Construir el historial para Gemini
         // El formato es [{ role: "user", parts: [{text: "..."}]}, {role: "model", parts: [{text: "..."}]}]
