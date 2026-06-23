@@ -1,7 +1,8 @@
 // js/api.js
 import { marked } from 'https://esm.sh/marked@9.0.0'; // Ajusta la versión si es necesario
 
-const BACKEND_URL = 'https://sussi-asistant.onrender.com/api/summarize';
+const BACKEND_URL = 'https://sussi-backend.onrender.com/api/summarize';
+const REQUEST_TIMEOUT = 30000; // 30 segundos
 
 export async function getAiResponse(userInput, conversation) {
     console.log("NUEVA API.getAiResponse EJECUTÁNDOSE");
@@ -18,6 +19,11 @@ export async function getAiResponse(userInput, conversation) {
 
     try {
         console.log(`Haciendo fetch a: ${BACKEND_URL}`);
+        
+        // Crear AbortController para timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
         const response = await fetch(BACKEND_URL, {
             method: 'POST',
             headers: {
@@ -28,39 +34,65 @@ export async function getAiResponse(userInput, conversation) {
                 systemPrompt: conversation.systemPrompt,
                 conversationHistory: conversationHistoryForApi,
             }),
+            signal: controller.signal
         });
-        console.log("Respuesta del backend (raw):", response);
+
+        clearTimeout(timeoutId);
+        console.log("Respuesta del backend (status):", response.status, response.statusText);
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: "Error desconocido del servidor", details: response.statusText }));
-            console.error("Error de la API (fetch no ok):", errorData);
-            throw new Error(errorData.error || `Error del servidor: ${response.status}`);
+            let errorData;
+            try {
+                errorData = await response.json();
+            } catch {
+                errorData = { 
+                    error: `Error del servidor: ${response.status}`, 
+                    details: response.statusText 
+                };
+            }
+            console.error("Error de la API:", errorData);
+            throw new Error(errorData.error || errorData.details || `Error del servidor: ${response.status}`);
         }
 
         const data = await response.json();
         console.log("Datos JSON del backend:", data);
+        
         let aiMessageText = data.aiResponse || "No se recibió respuesta de la IA.";
 
+        // Procesar Markdown
         if (typeof marked === 'function') {
-            // Para marked v5+, la función principal es `marked.parse()`. Si usas una versión anterior, podría ser solo `marked()`.
-            // Revisa la documentación de la versión específica que estés cargando.
-            // Asumiendo que 'marked' es la función parse directamente desde esm.sh o que es un objeto con un método 'parse'.
-            // Con `import { marked } from '...'`, `marked` suele ser la función parse directamente.
             aiMessageText = marked(aiMessageText);
+        } else if (typeof marked?.parse === 'function') {
+            aiMessageText = marked.parse(aiMessageText);
         } else {
-            console.warn("Librería 'marked' no encontrada o no es una función. La respuesta de la IA se mostrará como texto plano.");
+            console.warn("Librería 'marked' no disponible. Mostrando como texto plano.");
             const tempDiv = document.createElement('div');
             tempDiv.textContent = aiMessageText;
             aiMessageText = tempDiv.innerHTML.replace(/\n/g, '<br>');
         }
         
-        return { sender: 'ai', text: aiMessageText, isHtml: true, timestamp: Date.now() };
+        return { 
+            sender: 'ai', 
+            text: aiMessageText, 
+            isHtml: true, 
+            timestamp: Date.now() 
+        };
 
     } catch (error) {
-        console.error('Error en getAiResponse (catch):', error);
+        console.error('Error en getAiResponse:', error);
+        
+        let userMessage = 'Error al conectar con la IA';
+        if (error.name === 'AbortError') {
+            userMessage = 'La solicitud tardó demasiado (timeout). Intenta de nuevo.';
+        } else if (error.message.includes('Failed to fetch')) {
+            userMessage = 'No se pudo conectar al servidor. Verifica tu conexión a internet.';
+        } else {
+            userMessage = error.message;
+        }
+
         return {
             sender: 'error',
-            text: `<p>Error al conectar con la IA: ${error.message}. Revisa la consola del backend para más detalles.</p>`,
+            text: `<p>${userMessage}</p>`,
             isHtml: true,
             timestamp: Date.now()
         };
